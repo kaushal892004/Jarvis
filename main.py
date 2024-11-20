@@ -18,7 +18,7 @@ recognizer = sr.Recognizer()
 engine = pyttsx3.init() 
 
 #for getting latest news article headline we use API of  " https://newsapi.org/ " for News
-news_api_key = "f3e70ff73d7248c8a9599e991a21a819"
+news_api_key = "enter_yours_key"
 
 #with pyttsx3 module----------------------------------------------------------
 def speak_old(text):
@@ -53,24 +53,10 @@ def speak(text):
 
 #let request handled by GeminiAi ----------------------------------------------
 def aiProcess(command):
-    # try:
-    #     # Configure the API key
-    #     genai.configure(api_key="AIzaSyDOfOQEIGNGtZeuZv4rSRzAuvWtLEvcZnE")
-
-    #     # Initialize the Generative Model
-    #     model = genai.GenerativeModel('gemini-1.5-flash')
-
-    #     # Generate content based on the command
-    #     response = model.generate_content(command)
-
-    #     # Speak out the response text
-    #     speak(response.text)
-
-    # except Exception as e:
-    #     # Handle any other errors that occur
+  
     try:
         # Configure the API key
-        genai.configure(api_key="AIzaSyDOfOQEIGNGtZeuZv4rSRzAuvWtLEvcZnE")
+        genai.configure(api_key="add_your_key")
 
         # Initialize the Generative Model
         model = genai.GenerativeModel('gemini-1.5-flash')
