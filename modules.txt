@@ -1,0 +1,6 @@
+1.speechrecognition
+2.pyttsx3
+3.musicLibrary
+4.gtts
+5.pygame
+6.os
