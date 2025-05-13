@@ -1,6 +1,4 @@
-Here's a sample `README.md` file for your **Jarvis Project**:
 
----
 
 # 🤖 Jarvis: Your Personal AI Assistant 🚀
 
