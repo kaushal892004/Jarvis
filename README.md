@@ -1,60 +1,56 @@
+# 🤖 JARVIS: Just A Rather Very Intelligent System 🚀
 
+![JARVIS Terminal UI](image/Jarvis.png) <!-- Replace with your actual screenshot path -->
 
-# 🤖 Jarvis: Your Personal AI Assistant 🚀
-
-Jarvis is a smart, voice-activated personal assistant designed to perform a variety of tasks, including speech recognition, text-to-speech synthesis, and executing commands like opening applications, providing information, and more. Built with Python, it leverages libraries like `pyttsx3`, `speech_recognition`, and `PyAudio` to deliver an interactive user experience.
-
----
-
-## Features 🌟
-
-- **Voice Recognition**: Understands and processes spoken commands using `speech_recognition`.
-- **Text-to-Speech**: Converts text into natural-sounding speech using `pyttsx3`.
-- **Task Automation**: Executes system-level commands (e.g., opening applications, searching the web).
-- **Extensible Design**: Easily add new commands and functionalities.
-- **Cross-Platform Support**: Runs on Windows, macOS, and Linux.
+**JARVIS** is a Python-based AI assistant designed for seamless interaction through voice and text via a professional, terminal-style interface. It leverages cutting-edge tools in speech recognition, text-to-speech, system automation, and artificial intelligence to create a highly responsive and extendable personal assistant experience.
 
 ---
 
-## Installation 📦
+## 🌟 Features
+
+✅ **Voice/Text Command Processing**  
+🎙 Real-time voice recognition using `speech_recognition` and `PyAudio`  
+🗣 Converts responses to natural speech with `pyttsx3`
+
+🔍 **Web & Media Integration**  
+🌐 Perform Google searches using your voice or text commands  
+▶️ Play YouTube videos based on voice prompts
+
+📧 **Communication Automation**  
+📩 Send emails directly from the terminal  
+💬 Schedule WhatsApp messages to any contact or number
+
+🧠 **Smart AI Integration**  
+🧠 Handles unmatched or general queries using **Gemini AI**
+
+💻 **Professional Terminal UI**  
+🎨 Styled with `Rich`, `pyfiglet`, and ASCII banners for a hacker-inspired, modern terminal interface  
+🖼 Great for portfolio presentation and demonstrating Python + AI skillsets
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
-1. Python 3.8 or higher installed on your system.
-2. Virtual environment (optional but recommended).
 
-### Steps
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/kaushal892004/Jarvis.git
-   cd jarvis
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Windows: venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Ensure that `PyAudio` is correctly installed. If there are installation issues, you can use the following commands:
-   - On **Linux**:
-     ```bash
-     sudo apt-get install portaudio19-dev
-     pip install pyaudio
-     ```
-   - On **macOS**:
-     ```bash
-     brew install portaudio
-     pip install pyaudio
-     ```
-   - On **Windows**:
-     Download a compatible `PyAudio` `.whl` file from [PyAudio Downloads](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio) and install:
-     ```bash
-     pip install path_to_downloaded_file.whl
-     ```
+- Python 3.8 or higher
+- Git installed
+- Recommended: use a virtual environment
 
----
+### Setup Instructions
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/kaushal892004/Jarvis.git
+cd Jarvis
+
+# 2. Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# 3. Install required dependencies
+pip install -r requirements.txt
+
 
 ## Usage 🚀
 
@@ -62,58 +58,20 @@ Jarvis is a smart, voice-activated personal assistant designed to perform a vari
    ```bash
    python main.py
    ```
-2. Speak your commands after the assistant starts listening. Example commands:
-   - "Open Google"
-   - "What is the time?"
-   - "Search for Python tutorials"
-
----
-
-## Project Structure 📂
-
 ```
+
+📂 Project Structure
 Jarvis/
-├── main.py                # Entry point of the project
-├── requirements.txt       # List of dependencies
-├── README.md              # Project documentation
-├── venv/                  # Virtual environment (optional)
-└── jarvis/                # Core application directory
-    ├── modules/           # Custom modules for commands
-    ├── utils/             # Helper functions
-    └── config.py          # Configuration file
+├── assets/                # Screenshots or banners
+├── jarvis/                # Core application package
+│   ├── modules/           # Command handling modules
+│   ├── utils/             # Utility functions (helpers, validators)
+│   └── config.py          # API keys and configurations
+├── main.py                # Main entry point of the application
+├── requirements.txt       # All required dependencies
+├── README.md              # This documentation
+└── venv/                  # (Optional) Python virtual environment
+
 ```
-
----
-
-## Troubleshooting 🛠️
-
-1. **PyAudio Import Error**: Ensure `portaudio` is installed as per the installation section above.
-2. **Speech Recognition Issues**: Verify your microphone is connected and working properly.
-3. **Environment Errors**: Make sure you are running the project inside the correct virtual environment.
-
----
-
-## Contributing 🤝
-
-Contributions are welcome! To contribute:
-1. Fork this repository.
-2. Create a new branch for your feature or bugfix:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes and push to your fork.
-4. Open a pull request.
-
----
-
-
-## Acknowledgments 🙌
-
-- [Python](https://www.python.org/)
-- [SpeechRecognition](https://pypi.org/project/SpeechRecognition/)
-- [pyttsx3](https://pypi.org/project/pyttsx3/)
-- [PyAudio](https://pypi.org/project/PyAudio/)
-
-Feel free to modify and adapt this `README.md` according to your specific project details! 😊
 
 ### Made with ❤️ by [Kaushal Parmar](https://github.com/kaushal892004)
