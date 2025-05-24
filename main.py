@@ -1,155 +1,179 @@
-import speech_recognition as sr
-import webbrowser
-import pyttsx3
-import musiclist
-import requests
-from gtts import gTTS
-import pygame
 import os
-# from openai import OpenAI
-import openai
-import hugchat
-import google.generativeai as genai
+import time
+import datetime
+import webbrowser
+import speech_recognition as sr
+import pyfiglet
+import smtplib
+import pywhatkit
+from gtts import gTTS
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from rich.prompt import Prompt
+from google.generativeai import configure, GenerativeModel
+import re
 
-#for Taking input from user as a audio/speach
-recognizer = sr.Recognizer()
+# ========== INITIALIZE ==========
+console = Console()
+QUERY_LOG_FILE = "jarvis_query_log.txt"
 
-#used for converting user input to text
-engine = pyttsx3.init() 
-
-#for getting latest news article headline we use API of  " https://newsapi.org/ " for News
-news_api_key = "enter_yours_key"
-
-#with pyttsx3 module----------------------------------------------------------
-def speak_old(text):
-    engine.say(text)
-    engine.runAndWait()
-
-#---------------------------------------------------------------------------
-
-#with gTTS module----------------------------------------------------------
+# ========== SPEAK ==========
 def speak(text):
+    console.print(f"[bold cyan]JARVIS:[/bold cyan] {text}")
+    tts = gTTS(text=text, lang='en')
+    tts.save("voice.mp3")
+    os.system("start voice.mp3" if os.name == "nt" else "afplay voice.mp3")
+    time.sleep(1.5)
+    os.remove("voice.mp3")
 
-    tts = gTTS(text)
-    tts.save('temp.mp3') 
+# ========== WISHING ==========
+def wish_me():
+    hour = datetime.datetime.now().hour
+    greeting = "Good morning!" if hour < 12 else "Good afternoon!" if hour < 18 else "Good evening!"
+    speak(greeting)
+    speak("I am JARVIS. How can I assist you today?")
 
-    # Initialize Pygame mixer
-    pygame.mixer.init()
-
-    # Load the MP3 file
-    pygame.mixer.music.load('temp.mp3')
-
-    # Play the MP3 file
-    pygame.mixer.music.play()
-
-    # Keep the program running until the music stops playing
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
-    
-    pygame.mixer.music.unload()
-    os.remove("temp.mp3")     
-
-#---------------------------------------------------------------------------
-
-#let request handled by GeminiAi ----------------------------------------------
-def aiProcess(command):
-  
+# ========== VOICE INPUT ==========
+def take_voice_command():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        console.print("[yellow]🎙 Listening...[/yellow]")
+        r.pause_threshold = 1
+        audio = r.listen(source)
     try:
-        # Configure the API key
-        genai.configure(api_key="add_your_key")
+        console.print("[green]🧠 Recognizing...[/green]")
+        query = r.recognize_google(audio, language='en-in')
+        console.print(f"[bold magenta]🗣 You:[/bold magenta] {query}")
+    except Exception:
+        console.print("[red]❌ Sorry, I didn't catch that.[/red]")
+        return "none"
+    return query.lower()
 
-        # Initialize the Generative Model
-        model = genai.GenerativeModel('gemini-1.5-flash')
+# ========== TEXT INPUT ==========
+def take_text_command():
+    return Prompt.ask("[bold green]⌨️ Enter your command[/bold green]").lower()
 
-        # Define the system message and user message
-        system_message = "You are a virtual assistant named Jarvis skilled in general tasks like Alexa and Google Cloud. Give short responses please."
-        user_message = command
+# ========== LOGGING ==========
+def log_query(query):
+    with open(QUERY_LOG_FILE, "a") as f:
+        f.write(f"[{datetime.datetime.now()}] {query}\n")
 
-        # Concatenate the messages into a single string
-        full_prompt = f"System: {system_message}\nUser: {user_message}"
+# ========== GEMINI AI ==========
+def gemini_summary_response(prompt):
+    configure(api_key="AIzaSyDOfOQEIGNGtZeuZv4rSRzAuvWtLEvcZnE")
+    model = GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(
+        f"Give a short, simple, and accurate answer to: {prompt}",
+        generation_config={"temperature": 0.5, "max_output_tokens": 60}
+    )
+    return response.text.strip()
 
-        # Generate content based on the full prompt
-        response = model.generate_content(full_prompt)
-
-        # Speak out the response text
-        speak(response.text)
-
-        return response.text
-
-   
+# ========== EMAIL SENDING ==========
+def send_email(to_address, subject, body):
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login("kaushalparmarofficial@gmail.com", "jchj rbwn lndp pypd")
+        message = f"Subject: {subject}\n\n{body}"
+        server.sendmail("kaushalparmarofficial@gmail.com", to_address, message)
+        server.quit()
+        speak("Email has been sent successfully.")
     except Exception as e:
-        # Handle any other errors that occur
-            print(f"An unexpected error occurred: {e}")
+        speak("Sorry, I was unable to send the email.")
+        console.print(str(e), style="red")
 
-#---------------------------------------------------------------------------
+# ========== WHATSAPP MESSAGING ==========
+def send_whatsapp(phone_number, message):
+    try:
+        hour = datetime.datetime.now().hour
+        minute = datetime.datetime.now().minute + 1
+        pywhatkit.sendwhatmsg(phone_number, message, hour, minute)
+        speak("Message scheduled on WhatsApp.")
+    except Exception as e:
+        speak("Failed to send WhatsApp message.")
+        console.print(str(e), style="red")
 
-#for process the request of user --------------------------------------------
-def processCommand(c):
-    if  "open google" in c.lower():
-        webbrowser.open("http://google.com")
-    elif "open youtube" in c.lower():
-        webbrowser.open("http://youtube.com")  
-    elif "open linkedin" in c.lower():
-        webbrowser.open("https://www.linkedin.com/feed/")   
-    elif "open instagram" in c.lower():
-        webbrowser.open("https://www.instagram.com/") 
-    elif "open chatgpt" in c.lower():
-        webbrowser.open("https://chatgpt.com/")
 
-    elif c.lower().startswith("play"): 
-        song = " ".join(c.lower().split(" ")[1:])
-        # song = (c.lower().split(" ")[1:])
-        link = musiclist.music[song]
-        webbrowser.open(link)
+# ========== PERFORM ACTION ==========
+def perform_task(command):
+    speak("Processing your request...")
+    log_query(command)
+    time.sleep(1)
 
-    elif "tell me the news" in c.lower():
-        r = requests.get(f"https://newsapi.org/v2/top-headlines?country=in&apiKey={news_api_key}")
-        if r.status_code == 200:
-            # Parse the JSON response
-            data = r.json()
-            
-            # Extract the articles
-            articles = data.get('articles', [])
-            
-            # Print the headlines
-            for article in articles:
-                speak(article['title'])
-    else:
-        # output = aiProcess(c)
-        # speak(output)    
-        aiProcess(c)
+    command = command.lower()
 
-#---------------------------------------------------------------------------
-
-#main------------------------------------------------------------------------
-if __name__ == "__main__":
-    speak("Initializing Jarvis....")
-    while True:
-        
-        # obtain audio from the microphone
-        r = sr.Recognizer()
-        print("Recognizing....")
+    if "open youtube" in command:
+        webbrowser.open("https://youtube.com")
+        speak("Opening YouTube.")
+    elif "open google" in command:
+        webbrowser.open("https://google.com")
+        speak("Opening Google.")
+    elif "open instagram" in command:
+        webbrowser.open("https://www.instagram.com")
+        speak("Opening Instagram.")
+    elif re.search(r"play (.+) on youtube", command):
+        song = re.search(r"play (.+) on youtube", command).group(1)
+        speak(f"Searching and playing {song} on YouTube.")
         try:
-            with sr.Microphone() as source:
-                print("Listening...")
-                audio = r.listen(source, timeout=3, phrase_time_limit=1)
-            word = r.recognize_google(audio)
-            #listining for 'jarvis' word
-            if(word.lower() == "jarvis"):
-                speak("how can i help you")
-                # Listen for command
-                with sr.Microphone() as source:
-                    print("Jarvis Active...")
-                    audio = r.listen(source)
-                    command = r.recognize_google(audio)
-
-                    processCommand(command)
-
-
+            pywhatkit.playonyt(song)
         except Exception as e:
-            print("No Input! {0}".format(e))
+            speak("I couldn't play the video. Something went wrong.")
+            console.print(str(e), style="red")
+    elif re.search(r"search (.+) on google", command):
+        query = re.search(r"search (.+) on google", command).group(1)
+        webbrowser.open(f"https://www.google.com/search?q={query}")
+        speak(f"Searching for {query} on Google.")
+    elif "the time" in command:
+        strTime = datetime.datetime.now().strftime("%H:%M:%S")
+        speak(f"The time is {strTime}")
+    elif "send email" in command:
+        to = Prompt.ask("Enter recipient email")
+        subject = Prompt.ask("Enter subject")
+        body = Prompt.ask("Enter message")
+        send_email(to, subject, body)
+    elif "send whatsapp" in command:
+        phone = Prompt.ask("Enter phone number with country code")
+        message = Prompt.ask("Enter your message")
+        send_whatsapp(phone, message)
+    elif "stop" in command or "exit" in command:
+        speak("Shutting down. Have a nice day!")
+        exit()
+    else:
+        # fallback to Gemini AI
+        answer = gemini_summary_response(command)
+        speak(answer)
 
-#---------------------------------------------------------------------------            
-    
 
+# ========== DASHBOARD ==========
+def show_dashboard():
+    banner = pyfiglet.figlet_format("JARVIS", font="slant")
+    centered = "\n".join(line.center(80) for line in banner.split("\n"))
+    console.print(centered, style="bold blue")
 
+    profile_text = Text()
+    profile_text.append("Kaushal Parmar Here; ", style="bold white")
+    profile_text.append("✓\n", style="blue")
+    profile_text.append("Hi there, I am a software developer. Passionate about web developmentand Cloud/DevOps.\n\n", style="white")
+    profile_text.append("\U0001F419 GitHub: ", style="bold yellow")
+    profile_text.append("@kaushal892004\n", style="blue")
+    profile_text.append("\U0001F4BC LinkedIn: ", style="bold yellow")
+    profile_text.append("@kaushalparmar\n", style="blue")
+    profile_text.append("\U0001F4E7 Email: ", style="bold yellow")
+    profile_text.append("kaushalparmarofficial@gmail.com\n", style="blue")
+    console.print(Panel(profile_text, title="\U0001F468‍\U0001F4BB About Me", style="bold cyan", padding=(1, 2)))
+
+# ========== MAIN ==========
+if __name__ == "__main__":
+    os.system("cls" if os.name == "nt" else "clear")
+    show_dashboard()
+    speak("Initializing JARVIS. Please wait...")
+    time.sleep(1)
+    speak("JARVIS initialized.")
+    wish_me()
+
+    while True:
+        mode = Prompt.ask("\n[bold cyan]\U0001F9E0 Choose input mode[/bold cyan] ", choices=["text", "voice"])
+        command = take_text_command() if mode == "text" else take_voice_command()
+        if command != "none":
+            perform_task(command)
